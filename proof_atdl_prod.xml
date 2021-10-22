@@ -2,52 +2,133 @@
 <!--
     - - - - - - - - - - - - - - - - - - - - - - - - - -
     Proof FIX ATDL definitions.
-    (C) 2020 Proof Services LLC 
+    (C) 2020-2021 Proof Services LLC
     All rights reserved.
     https://prooftrading.com
     - - - - - - - - - - - - - - - - - - - - - - - - - -
 -->
-<Strategies xmlns="http://www.fixprotocol.org/FIXatdl-1-1/Core" xmlns:val="http://www.fixprotocol.org/FIXatdl-1-1/Validation" xmlns:lay="http://www.fixprotocol.org/FIXatdl-1-1/Layout" xmlns:flow="http://www.fixprotocol.org/FIXatdl-1-1/Flow" xmlns:tz="http://www.fixprotocol.org/FIXatdl-1-1/Timezones" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.fixprotocol.org/FIXatdl-1-1/Core fixatdl-core-1-1.xsd" strategyIdentifierTag="847" versionIdentifierTag="9682">
-	<!-- ************************ -->
-	<!-- ******* PROOF ********  -->
-	<!-- ************************ -->
-	<Strategy name="PROOF" uiRep="PROOF" wireValue="1001" version="1" fixMsgType="D" providerID="RF">
-		<Regions>
-			<Region name="TheAmericas" inclusion="Include">
-				<Country CountryCode="US" inclusion="Include"/>
-			</Region>
-		</Regions>
-		<!-- Parameter Section -->
-		<Parameter name="EffectiveTime" xsi:type="UTCTimestamp_t" fixTag="168" mutableOnCxlRpl="false">
-			<Description>Target Start Time</Description>
-		</Parameter>
-		<Parameter name="ExpireTime" xsi:type="UTCTimestamp_t" fixTag="126" maxValue="23:59:59" localMktTz="America/New_York" mutableOnCxlRpl="false">
-			<Description>Target End Time</Description>
-		</Parameter>
-		<Parameter name="MustComplete" xsi:type="Boolean_t" fixTag="20001" use="required" mutableOnCxlRpl="false"/>
-		<Parameter name="LowCost" xsi:type="Boolean_t" fixTag="20002" use="required" mutableOnCxlRpl="false"/>
-		<Parameter name="VWAP" xsi:type="Boolean_t" fixTag="20003" use="required" mutableOnCxlRpl="false"/>
-		<!-- Layout Section -->
-		<lay:StrategyLayout>
-			<lay:StrategyPanel orientation="VERTICAL" collapsible="false">
-				<lay:StrategyPanel orientation="HORIZONTAL" collapsible="false">
-					<lay:Control xsi:type="lay:Clock_t" ID="EffectiveTimeClock" label="Start Time" parameterRef="EffectiveTime" initValue="09:30:00" localMktTz="America/New_York"/>
-					<lay:Control xsi:type="lay:Clock_t" ID="ExpireTimeClock" label="End Time" parameterRef="ExpireTime" initValue="16:00:00" initValueMode="1" localMktTz="America/New_York"/>
-				</lay:StrategyPanel>
-				<lay:StrategyPanel orientation="HORIZONTAL" collapsible="false">
-					<lay:Control xsi:type="lay:CheckBox_t" ID="MustCompleteEntry" label="Must Complete" parameterRef="MustComplete"/>
-					<lay:Control xsi:type="lay:CheckBox_t" ID="LowCostEntry" label="Low Cost" parameterRef="LowCost"/>
-					<lay:Control xsi:type="lay:CheckBox_t" ID="VWAPEntry" label="VWAP" parameterRef="VWAP"/>
-				</lay:StrategyPanel>
-			</lay:StrategyPanel>
-		</lay:StrategyLayout>
-		<!-- Validation Section -->
-		<val:StrategyEdit errorMessage="End Time should be later than Start Time">
-			<val:Edit logicOperator="OR">
-				<val:Edit field="EffectiveTime" operator="NX"/>
-				<val:Edit field="ExpireTime" operator="NX"/>
-				<val:Edit field="ExpireTime" operator="GT" field2="EffectiveTime"/>
-			</val:Edit>
-		</val:StrategyEdit>
-	</Strategy>
+<!--suppress XmlUnusedNamespaceDeclaration, XmlDefaultAttributeValue -->
+<Strategies xmlns="http://www.fixprotocol.org/FIXatdl-1-1/Core" xmlns:val="http://www.fixprotocol.org/FIXatdl-1-1/Validation" xmlns:lay="http://www.fixprotocol.org/FIXatdl-1-1/Layout" xmlns:flow="http://www.fixprotocol.org/FIXatdl-1-1/Flow"
+            xmlns:tz="http://www.fixprotocol.org/FIXatdl-1-1/Timezones" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.fixprotocol.org/FIXatdl-1-1/Core fixatdl-core-1-1.xsd" strategyIdentifierTag="847"
+            versionIdentifierTag="9682">
+    <!-- ******* VWAP ********  -->
+    <Strategy name="VWAP" uiRep="VWAP" wireValue="1001" version="1" fixMsgType="D" providerID="PROOF">
+        <Regions>
+            <Region name="TheAmericas" inclusion="Include">
+                <Country CountryCode="US" inclusion="Include"/>
+            </Region>
+        </Regions>
+        <!-- Parameter Section -->
+        <Parameter name="EffectiveTime" xsi:type="UTCTimestamp_t" fixTag="168" mutableOnCxlRpl="true">
+            <Description>Target Start Time</Description>
+        </Parameter>
+        <Parameter name="ExpireTime" xsi:type="UTCTimestamp_t" fixTag="126" maxValue="16:00:00" localMktTz="America/New_York" mutableOnCxlRpl="true">
+            <Description>Target End Time</Description>
+        </Parameter>
+        <Parameter name="MustComplete" xsi:type="Boolean_t" fixTag="20001" use="required" mutableOnCxlRpl="true"/>
+        <Parameter name="LowCost" xsi:type="Boolean_t" fixTag="20002" use="required" mutableOnCxlRpl="true"/>
+        <Parameter name="Custom" xsi:type="String_t" fixTag="20004" maxLength="128" mutableOnCxlRpl="true"/>
+        <!-- Layout Section -->
+        <lay:StrategyLayout>
+            <lay:StrategyPanel orientation="VERTICAL" collapsible="false">
+                <lay:StrategyPanel orientation="HORIZONTAL" collapsible="false">
+                    <lay:Control xsi:type="lay:Clock_t" ID="EffectiveTimeClock" label="Start Time" parameterRef="EffectiveTime" initValue="09:30:00" localMktTz="America/New_York"/>
+                    <lay:Control xsi:type="lay:Clock_t" ID="ExpireTimeClock" label="End Time" parameterRef="ExpireTime" initValue="16:00:00" initValueMode="1" localMktTz="America/New_York"/>
+                </lay:StrategyPanel>
+                <lay:StrategyPanel orientation="HORIZONTAL" collapsible="false">
+                    <lay:Control xsi:type="lay:CheckBox_t" ID="MustCompleteEntry" label="Must Complete" parameterRef="MustComplete"/>
+                    <lay:Control xsi:type="lay:CheckBox_t" ID="LowCostEntry" label="Low Cost" parameterRef="LowCost"/>
+                    <lay:Control xsi:type="lay:TextField_t" ID="CustomEntry" label="Custom" parameterRef="Custom"/>
+                </lay:StrategyPanel>
+            </lay:StrategyPanel>
+        </lay:StrategyLayout>
+        <!-- Validation Section -->
+        <val:StrategyEdit errorMessage="End Time should be later than Start Time">
+            <val:Edit logicOperator="OR">
+                <val:Edit field="EffectiveTime" operator="NX"/>
+                <val:Edit field="ExpireTime" operator="NX"/>
+                <val:Edit field="ExpireTime" operator="GT" field2="EffectiveTime"/>
+            </val:Edit>
+        </val:StrategyEdit>
+    </Strategy>
+    <!-- ******* PROOF ********  -->
+    <Strategy name="PROOF" uiRep="PROOF" wireValue="1002" version="1" fixMsgType="D" providerID="PROOF">
+        <Regions>
+            <Region name="TheAmericas" inclusion="Include">
+                <Country CountryCode="US" inclusion="Include"/>
+            </Region>
+        </Regions>
+        <!-- Parameter Section -->
+        <Parameter name="EffectiveTime" xsi:type="UTCTimestamp_t" fixTag="168" mutableOnCxlRpl="true">
+            <Description>Target Start Time</Description>
+        </Parameter>
+        <Parameter name="ExpireTime" xsi:type="UTCTimestamp_t" fixTag="126" maxValue="16:00:00" localMktTz="America/New_York" mutableOnCxlRpl="true">
+            <Description>Target End Time</Description>
+        </Parameter>
+        <Parameter name="MustComplete" xsi:type="Boolean_t" fixTag="20001" use="required" mutableOnCxlRpl="true"/>
+        <Parameter name="LowCost" xsi:type="Boolean_t" fixTag="20002" use="required" mutableOnCxlRpl="true"/>
+        <Parameter name="Custom" xsi:type="String_t" fixTag="20004" maxLength="128" mutableOnCxlRpl="true"/>
+        <!-- Layout Section -->
+        <lay:StrategyLayout>
+            <lay:StrategyPanel orientation="VERTICAL" collapsible="false">
+                <lay:StrategyPanel orientation="HORIZONTAL" collapsible="false">
+                    <lay:Control xsi:type="lay:Clock_t" ID="EffectiveTimeClock" label="Start Time" parameterRef="EffectiveTime" initValue="09:30:00" localMktTz="America/New_York"/>
+                    <lay:Control xsi:type="lay:Clock_t" ID="ExpireTimeClock" label="End Time" parameterRef="ExpireTime" initValue="16:00:00" initValueMode="1" localMktTz="America/New_York"/>
+                </lay:StrategyPanel>
+                <lay:StrategyPanel orientation="HORIZONTAL" collapsible="false">
+                    <lay:Control xsi:type="lay:CheckBox_t" ID="MustCompleteEntry" label="Must Complete" parameterRef="MustComplete"/>
+                    <lay:Control xsi:type="lay:CheckBox_t" ID="LowCostEntry" label="Low Cost" parameterRef="LowCost"/>
+                    <lay:Control xsi:type="lay:TextField_t" ID="CustomEntry" label="Custom" parameterRef="Custom"/>
+                </lay:StrategyPanel>
+            </lay:StrategyPanel>
+        </lay:StrategyLayout>
+        <!-- Validation Section -->
+        <val:StrategyEdit errorMessage="End Time should be later than Start Time">
+            <val:Edit logicOperator="OR">
+                <val:Edit field="EffectiveTime" operator="NX"/>
+                <val:Edit field="ExpireTime" operator="NX"/>
+                <val:Edit field="ExpireTime" operator="GT" field2="EffectiveTime"/>
+            </val:Edit>
+        </val:StrategyEdit>
+    </Strategy>
+    <!-- ******* CUSTOM ********  -->
+    <Strategy name="CUSTOM" uiRep="CUSTOM" wireValue="1003" version="1" fixMsgType="D" providerID="PROOF">
+        <Regions>
+            <Region name="TheAmericas" inclusion="Include">
+                <Country CountryCode="US" inclusion="Include"/>
+            </Region>
+        </Regions>
+        <!-- Parameter Section -->
+        <Parameter name="EffectiveTime" xsi:type="UTCTimestamp_t" fixTag="168" mutableOnCxlRpl="true">
+            <Description>Target Start Time</Description>
+        </Parameter>
+        <Parameter name="ExpireTime" xsi:type="UTCTimestamp_t" fixTag="126" maxValue="16:00:00" localMktTz="America/New_York" mutableOnCxlRpl="true">
+            <Description>Target End Time</Description>
+        </Parameter>
+        <Parameter name="MustComplete" xsi:type="Boolean_t" fixTag="20001" use="required" mutableOnCxlRpl="true"/>
+        <Parameter name="LowCost" xsi:type="Boolean_t" fixTag="20002" use="required" mutableOnCxlRpl="true"/>
+        <Parameter name="Custom" xsi:type="String_t" fixTag="20004" maxLength="128" mutableOnCxlRpl="true"/>
+        <!-- Layout Section -->
+        <lay:StrategyLayout>
+            <lay:StrategyPanel orientation="VERTICAL" collapsible="false">
+                <lay:StrategyPanel orientation="HORIZONTAL" collapsible="false">
+                    <lay:Control xsi:type="lay:Clock_t" ID="EffectiveTimeClock" label="Start Time" parameterRef="EffectiveTime" initValue="09:30:00" localMktTz="America/New_York"/>
+                    <lay:Control xsi:type="lay:Clock_t" ID="ExpireTimeClock" label="End Time" parameterRef="ExpireTime" initValue="16:00:00" initValueMode="1" localMktTz="America/New_York"/>
+                </lay:StrategyPanel>
+                <lay:StrategyPanel orientation="HORIZONTAL" collapsible="false">
+                    <lay:Control xsi:type="lay:CheckBox_t" ID="MustCompleteEntry" label="Must Complete" parameterRef="MustComplete"/>
+                    <lay:Control xsi:type="lay:CheckBox_t" ID="LowCostEntry" label="Low Cost" parameterRef="LowCost"/>
+                    <lay:Control xsi:type="lay:TextField_t" ID="CustomEntry" label="Custom" parameterRef="Custom"/>
+                </lay:StrategyPanel>
+            </lay:StrategyPanel>
+        </lay:StrategyLayout>
+        <!-- Validation Section -->
+        <val:StrategyEdit errorMessage="End Time should be later than Start Time">
+            <val:Edit logicOperator="OR">
+                <val:Edit field="EffectiveTime" operator="NX"/>
+                <val:Edit field="ExpireTime" operator="NX"/>
+                <val:Edit field="ExpireTime" operator="GT" field2="EffectiveTime"/>
+            </val:Edit>
+        </val:StrategyEdit>
+    </Strategy>
 </Strategies>
